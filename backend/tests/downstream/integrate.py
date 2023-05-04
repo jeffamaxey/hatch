@@ -43,18 +43,19 @@ class EnvVars(dict):
 
     def __enter__(self):
         os.environ.clear()
-        os.environ.update(self)
+        os.environ |= self
 
     def __exit__(self, exc_type, exc_value, traceback):
         os.environ.clear()
-        os.environ.update(self.old_env)
+        os.environ |= self.old_env
 
 
 def python_version_supported(project_config):
-    requires_python = project_config['project'].get('requires-python', '')
-    if requires_python:
+    if requires_python := project_config['project'].get('requires-python', ''):
         python_constraint = SpecifierSet(requires_python)
-        if not python_constraint.contains(str('.'.join(map(str, sys.version_info[:2])))):
+        if not python_constraint.contains(
+            '.'.join(map(str, sys.version_info[:2]))
+        ):
             return False
 
     return True
@@ -102,7 +103,7 @@ def get_venv_exe_dir(venv_dir):
 
 def main():
     original_backend_path = os.path.dirname(os.path.dirname(HERE))
-    with temp_dir() as links_dir, temp_dir() as build_dir:
+    with (temp_dir() as links_dir, temp_dir() as build_dir):
         print('<<<<< Copying backend >>>>>')
         backend_path = os.path.join(build_dir, 'backend')
         shutil.copytree(original_backend_path, backend_path)
@@ -159,7 +160,7 @@ def main():
             # Not yet ported
             if os.path.isfile(potential_project_file):
                 with open(potential_project_file) as f:
-                    project_config.update(tomli.loads(f.read()))
+                    project_config |= tomli.loads(f.read())
 
                 if not python_version_supported(project_config):
                     print('--> Unsupported version of Python, skipping')
@@ -251,8 +252,7 @@ def main():
                     for statement in test_data['statements']:
                         subprocess.check_call([shutil.which('python'), '-c', statement])
 
-                    scripts = project_config['project'].get('scripts', {})
-                    if scripts:
+                    if scripts := project_config['project'].get('scripts', {}):
                         print('--> Testing scripts')
                         for script in scripts:
                             if not shutil.which(script):

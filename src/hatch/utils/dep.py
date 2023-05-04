@@ -19,8 +19,10 @@ def get_project_dependencies_complex(environment):
 
     dynamic_fields = environment.metadata.dynamic
     if 'dependencies' not in dynamic_fields and 'optional-dependencies' not in dynamic_fields:
-        dependencies_complex.update(environment.metadata.core.dependencies_complex)
-        optional_dependencies_complex.update(environment.metadata.core.optional_dependencies_complex)
+        dependencies_complex |= environment.metadata.core.dependencies_complex
+        optional_dependencies_complex |= (
+            environment.metadata.core.optional_dependencies_complex
+        )
     elif dependencies_in_sync(environment.metadata.build.requires_complex):
         dependencies_complex.update(environment.metadata.core.dependencies_complex)
         optional_dependencies_complex.update(environment.metadata.core.optional_dependencies_complex)

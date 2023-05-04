@@ -30,7 +30,7 @@ def construct_matrix_data(env_name, config, overrides=None):
                 python_selected = True
                 variables[variable] = matrix.pop(variable)
                 break
-        variables.update(matrix)
+        variables |= matrix
 
         for result in product(*variables.values()):
             variable_values = dict(zip(variables, result))
@@ -49,7 +49,7 @@ def construct_matrix_data(env_name, config, overrides=None):
             if 'py' in variable_values:
                 envs[new_env_name] = {'python': variable_values.pop('py'), **variable_values}
 
-    config.update(overrides or {})
+    config |= (overrides or {})
     config.setdefault('type', 'virtual')
     return {'config': config, 'envs': envs}
 

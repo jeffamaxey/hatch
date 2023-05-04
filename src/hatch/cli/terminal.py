@@ -44,8 +44,7 @@ class Terminal:
         for option, style in styles.items():
             attribute = f'_style_level_{option}'
 
-            default_level = getattr(self, attribute, None)
-            if default_level:
+            if default_level := getattr(self, attribute, None):
                 try:
                     style = Style.parse(style)
                 except StyleSyntaxError as e:  # no cov
@@ -138,10 +137,7 @@ class Terminal:
             return
 
         for i in range(num_rows or max(map(max, columns.values())) + 1):
-            row = []
-            for indices in columns.values():
-                row.append(indices.get(i, ''))
-
+            row = [indices.get(i, '') for indices in columns.values()]
             if any(row):
                 table.add_row(*row)
 

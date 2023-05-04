@@ -54,13 +54,12 @@ class DefaultTemplate(TemplateInterface):
         config['license_data'] = license_data
         config['license_expression'] = ' OR '.join(license_data)
         config['license_header'] = (
-            ''
-            if not config['licenses']['headers']
-            else f"""\
-# SPDX-FileCopyrightText: {self.creation_time.year}-present {config['name']} <{config['email']}>
+            f"""\\n        ## SPDX-FileCopyrightText: {self.creation_time.year}-present {config['name']} <{config['email']}>
 #
 # SPDX-License-Identifier: {config['license_expression']}
 """
+            if config['licenses']['headers']
+            else ''
         )
         if len(license_ids) == 1:
             config['license_files'] = ''
@@ -76,9 +75,7 @@ class DefaultTemplate(TemplateInterface):
     def get_files(self, config):
         files = list(find_template_files(files_default))
 
-        # Add any licenses
-        license_data = config['license_data']
-        if license_data:
+        if license_data := config['license_data']:
             if len(license_data) == 1:
                 license_id, text = list(license_data.items())[0]
                 license_text = get_license_text(config, license_id, text, self.creation_time)

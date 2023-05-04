@@ -109,7 +109,14 @@ def publish(
         app.project.config.publish.get(publisher_name, {}),
         app.config.publish.get(publisher_name, {}),
     )
-    if publisher.disable and not (yes or (not no_prompt and app.confirm(f'Confirm `{publisher_name}` publishing'))):
+    if (
+        publisher.disable
+        and not yes
+        and (
+            no_prompt
+            or not app.confirm(f'Confirm `{publisher_name}` publishing')
+        )
+    ):
         app.abort(f'Publisher is disabled: {publisher_name}')
 
     publisher.publish(list(artifacts), option_map)

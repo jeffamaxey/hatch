@@ -97,11 +97,11 @@ def table(app, project_only, env_only, show_lines, force_ascii):
             if requirement.extras:
                 columns['Features'][i] = ', '.join(sorted(requirement.extras))
 
-        column_options = {}
-        for column_title in columns:
-            if column_title != 'URL':
-                column_options[column_title] = {'no_wrap': True}
-
+        column_options = {
+            column_title: {'no_wrap': True}
+            for column_title in columns
+            if column_title != 'URL'
+        }
         app.display_table(
             table_title, columns, show_lines=show_lines, column_options=column_options, force_ascii=force_ascii
         )

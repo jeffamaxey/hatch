@@ -352,7 +352,7 @@ class WheelBuilder(BuilderInterface):
 
         build_data['tag'] = self.get_default_tag()
 
-        with WheelArchive(self.artifact_project_id, self.config.reproducible) as archive, RecordFile() as records:
+        with (WheelArchive(self.artifact_project_id, self.config.reproducible) as archive, RecordFile() as records):
             exposed_packages = {}
             for included_file in self.recurse_project_files():
                 if not included_file.path.endswith('.py'):
@@ -406,9 +406,6 @@ class WheelBuilder(BuilderInterface):
             for dependency in editable_project.dependencies():
                 if dependency == 'editables':
                     dependency += f'~={EDITABLES_MINIMUM_VERSION}'
-                else:  # no cov
-                    pass
-
                 extra_dependencies.append(dependency)
 
             self.write_data(archive, records, build_data, extra_dependencies)
@@ -493,8 +490,7 @@ Root-Is-Purelib: {'true' if build_data['pure_python'] else 'false'}
         records.write(record)
 
     def write_entry_points_file(self, archive, records):
-        entry_points_file = self.construct_entry_points_file()
-        if entry_points_file:
+        if entry_points_file := self.construct_entry_points_file():
             record = archive.write_metadata('entry_points.txt', entry_points_file)
             records.write(record)
 
@@ -552,10 +548,13 @@ Root-Is-Purelib: {'true' if build_data['pure_python'] else 'false'}
         return {'infer_tag': False, 'pure_python': True, 'dependencies': [], 'force_include_editable': {}}
 
     def get_forced_inclusion_map(self, build_data):
-        if not build_data['force_include_editable']:
-            return self.config.get_force_include()
-
-        return normalize_inclusion_map(build_data['force_include_editable'], self.root)
+        return (
+            normalize_inclusion_map(
+                build_data['force_include_editable'], self.root
+            )
+            if build_data['force_include_editable']
+            else self.config.get_force_include()
+        )
 
     @property
     def artifact_project_id(self):

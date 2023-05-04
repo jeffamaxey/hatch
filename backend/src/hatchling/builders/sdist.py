@@ -28,11 +28,7 @@ class SdistArchive:
         self.name = name
         self.reproducible = reproducible
 
-        if reproducible:
-            self.timestamp = get_reproducible_timestamp()
-        else:
-            self.timestamp = None
-
+        self.timestamp = get_reproducible_timestamp() if reproducible else None
         raw_fd, self.path = tempfile.mkstemp(suffix='.tar.gz')
         self.fd = os.fdopen(raw_fd, 'w+b')
         self.gz = gzip.GzipFile(fileobj=self.fd, mode='wb', mtime=self.timestamp)
@@ -196,10 +192,10 @@ class SdistBuilder(BuilderInterface):
         )
 
     def construct_setup_py_file(self, packages, extra_dependencies=()):
-        contents = '# -*- coding: utf-8 -*-\nfrom setuptools import setup\n\n'
-
-        contents += 'setup(\n'
-
+        contents = (
+            '# -*- coding: utf-8 -*-\nfrom setuptools import setup\n\n'
+            + 'setup(\n'
+        )
         contents += f'    name={self.metadata.core.name!r},\n'
         contents += f'    version={self.metadata.version!r},\n'
 
@@ -311,13 +307,11 @@ class SdistBuilder(BuilderInterface):
             for exclusion_file in exclusion_files:
                 force_include[exclusion_file] = os.path.basename(exclusion_file)
 
-        readme_path = self.metadata.core.readme_path
-        if readme_path:
+        if readme_path := self.metadata.core.readme_path:
             readme_path = normalize_relative_path(readme_path)
             force_include[os.path.join(self.root, readme_path)] = readme_path
 
-        license_files = self.metadata.core.license_files
-        if license_files:
+        if license_files := self.metadata.core.license_files:
             for license_file in license_files:
                 license_file = normalize_relative_path(license_file)
                 force_include[os.path.join(self.root, license_file)] = license_file

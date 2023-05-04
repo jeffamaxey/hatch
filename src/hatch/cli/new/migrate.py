@@ -17,8 +17,7 @@ def _apply_env_vars(kwargs):
 def _parse_dependencies(dependency_definition):
     dependencies = []
     for line in dependency_definition.splitlines():
-        line = line.split(' #', 1)[0].strip()
-        if line:
+        if line := line.split(' #', 1)[0].strip():
             dependencies.append(line)
 
     return dependencies
@@ -95,8 +94,11 @@ def _parse_setup_cfg(kwargs):
         if 'packages' in options and 'packages' not in kwargs:
             packages = []
             for package in options['packages'].strip().splitlines():
-                package = package.replace('find:', '', 1).replace('find_namespace:', '', 1).strip()
-                if package:
+                if (
+                    package := package.replace('find:', '', 1)
+                    .replace('find_namespace:', '', 1)
+                    .strip()
+                ):
                     packages.append(package)
 
             if packages:

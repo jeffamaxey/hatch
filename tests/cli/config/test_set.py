@@ -100,12 +100,12 @@ def test_prompt_hidden(hatch, config_file, helpers):
 
     assert result.exit_code == 0, result.output
     assert result.output == helpers.dedent(
-        f"""
-        Value for `publish.index.auth`:{' '}
+        '
+        Value for `publish.index.auth`: 
         New setting:
         [publish.index]
         auth = "<...>"
-        """
+        '
     )
 
     config_file.load()

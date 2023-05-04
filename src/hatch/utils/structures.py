@@ -27,8 +27,8 @@ class EnvVars(dict):
 
     def __enter__(self):
         os.environ.clear()
-        os.environ.update(self)
+        os.environ |= self
 
     def __exit__(self, exc_type, exc_value, traceback):
         os.environ.clear()
-        os.environ.update(self.old_env)
+        os.environ |= self.old_env

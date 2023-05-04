@@ -244,7 +244,7 @@ class ProjectConfig:
                             matrix = matrix.copy()
                             variables[variable] = matrix.pop(variable)
 
-                    variables.update(matrix)
+                    variables |= matrix
 
                     for result in product(*variables.values()):
                         # Make a value mapping for easy referencing
@@ -314,7 +314,7 @@ class ProjectConfig:
                 del cached_overrides[env_name]
 
                 # Save the variables used to generate the environments
-                generated_envs.update(all_envs)
+                generated_envs |= all_envs
 
             for environment_collector in environment_collectors:
                 environment_collector.finalize_environments(final_config)

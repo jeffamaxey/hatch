@@ -60,11 +60,7 @@ class IndexPublisher(PublisherInterface):
 
         repos = self.get_repos()
 
-        if repo in repos:
-            repo_config = repos[repo]
-        else:
-            repo_config = {'url': repo}
-
+        repo_config = repos[repo] if repo in repos else {'url': repo}
         index = PackageIndex(
             repo_config['url'],
             ca_cert=options.get('ca_cert', repo_config.get('ca-cert')),
@@ -213,15 +209,14 @@ class CachedUserFile:
     @property
     def data(self):
         if self._data is None:
-            if not self.path.is_file():
-                self._data = {}
-            else:
-                contents = self.path.read_text()
-                if not contents:  # no cov
-                    self._data = {}
-                else:
+            if self.path.is_file():
+                if contents := self.path.read_text():
                     import json
 
                     self._data = json.loads(contents)
 
+                else:
+                    self._data = {}
+            else:
+                self._data = {}
         return self._data

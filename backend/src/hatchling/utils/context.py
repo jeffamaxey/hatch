@@ -124,11 +124,10 @@ class ContextStringFormatter(string.Formatter):
         if key in self.__formatters:
             # Avoid hard look-up and rely on `None` to indicate that the field is undefined
             return kwargs.get(key)
-        else:
-            try:
-                return super().get_value(key, args, kwargs)
-            except KeyError:
-                raise ValueError(f'Unknown context field `{key}`') from None
+        try:
+            return super().get_value(key, args, kwargs)
+        except KeyError:
+            raise ValueError(f'Unknown context field `{key}`') from None
 
     def format_field(self, value, format_spec):
         formatter, _, data = format_spec.partition(':')

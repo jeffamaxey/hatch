@@ -33,10 +33,7 @@ def get_relative_path(path, start):
     relative_path = os.path.relpath(path, start)
 
     # First iteration of `os.walk`
-    if relative_path == '.':
-        return ''
-
-    return relative_path
+    return '' if relative_path == '.' else relative_path
 
 
 def normalize_relative_path(path):
@@ -61,10 +58,7 @@ def normalize_inclusion_map(inclusion_map, root):
 
 
 def normalize_archive_path(path):
-    if os.sep != '/':
-        return path.replace(os.sep, '/')
-
-    return path
+    return path.replace(os.sep, '/') if os.sep != '/' else path
 
 
 def format_file_hash(digest):
